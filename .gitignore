@@ -1,0 +1,9 @@
+_*
+.idea
+*.http
+node_modules
+*.private.*
+package.json
+package-lock.json
+README.md.orig.*
+README.md.toc.*
