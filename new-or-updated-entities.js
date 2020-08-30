@@ -1,6 +1,7 @@
 const fibery = require('https://github.com/blessingefkt/fibery-pipedream-event-sources/fibery.app.js');
+
 module.exports = {
-    name: "fibery-entities-created",
+    name: "fibery-entities-created-or-updated",
     version: "0.0.1",
     props: {
         fibery,
@@ -15,12 +16,12 @@ module.exports = {
         fields: {
             type: "string[]",
             async options() {
-                return this.fibery.getTypeFieldOptions(this.entityType);
+                return await this.fibery.getTypeFieldOptions(this.entityType);
             },
         },
         limit: {
             type: "string",
-            default: "10",
+            default: "10"
         },
         timer: {
             type: "$.interface.timer",
@@ -33,13 +34,14 @@ module.exports = {
         const dbKey = `lastMaxTimestamp/${this.fibery.$auth.account_name}/${this.entityType}`;
         const lastMaxTimestamp = this.db.get(dbKey);
         const queryObject = await this.fibery.getQueryObject(this.entityType, {
-            fields: this.fields,
-            dateFields: ['fibery/creation-date'],
             lastMaxTimestamp: lastMaxTimestamp,
+            fields: this.fields,
+            dateFields: ['fibery/creation-date', 'fibery/modification-date'],
             limit: Number(this.limit)
         });
+        const entityType = queryObject.query['q/from'];
 
-        console.log('queryObject', JSON.stringify(queryObject, null, 2));
+        console.log('query', JSON.stringify(queryObject, null, 2));
         let entities = [];
 
         entities = await this.fibery.queryEntities(queryObject.query, queryObject.params);
@@ -48,7 +50,7 @@ module.exports = {
             return;
         }
 
-        const metadata = {entityType: this.entityType, lastMaxTimestamp};
+        const metadata = {entityType, lastMaxTimestamp};
 
         let maxTimestamp;
         const entityIds = [];

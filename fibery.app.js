@@ -1,5 +1,6 @@
 const Fibery = require('fibery-unofficial');
 const get = require('lodash.get');
+const sortby = require('lodash.sortby');
 
 const FIBERY_META = {
     complexTypes: [
@@ -10,6 +11,7 @@ const FIBERY_META = {
         'fibery/id',
         'fibery/public-id',
         'fibery/creation-date',
+        'fibery/modification-date',
         'fibery/url',
         'fibery/type',
     ],
@@ -80,11 +82,15 @@ module.exports = {
         },
         async typeOptions() {
             const schema = await this.schema();
-            return uniqueArray(
-                schema
-                    .filter(type => !FIBERY_META.hiddenTypes.includes(type['fibery/name']))
-                    .map(type => type['fibery/name'])
-            ).map(fieldName => ({value: fieldName, label: fieldName,}));
+            return sortby(
+                uniqueArray(
+                    schema
+                        .filter(type => !FIBERY_META.hiddenTypes.includes(type['fibery/name']))
+                        .map(type => type['fibery/name'])
+                )
+                    .map(fieldName => ({value: fieldName, label: fieldName,})),
+                ['label']
+            );
         },
         async getType(typeId) {
             const schema = await this.schema();
@@ -100,10 +106,12 @@ module.exports = {
         async getTypeFieldOptions(typeId) {
             const fields = await this.getTypeFields(typeId);
             const allFields = [...this.getSimpleFields(fields), ...this.getRelatedFields(fields)];
-            const uniqueFieldNames = uniqueArray(allFields.map(f => f['fibery/name']));
-            return uniqueFieldNames
-                .map(fieldName => allFields.find(f => f['fibery/name'] === fieldName))
-                .map(f => ({value: f['fibery/id'], label: f['fibery/name']}));
+            return sortby(
+                uniqueArray(allFields.map(f => f['fibery/name']))
+                    .map(fieldName => allFields.find(f => f['fibery/name'] === fieldName))
+                    .map(f => ({value: f['fibery/id'], label: f['fibery/name']})),
+                ['label']
+            );
         },
         async queryEntities(query, params) {
             return await this.getClient().entity.query(query, params);
@@ -170,7 +178,7 @@ module.exports = {
             return uniqueArray(selects);
         },
 
-        async getQueryObject(typeNameOrId, fields) {
+        async getQueryObject(typeNameOrId, {fields, dateFields, limit, lastMaxTimestamp}) {
             const type = await this.getType(typeNameOrId);
             const fieldNames = fields
                 .map(value => {
@@ -183,21 +191,24 @@ module.exports = {
                 })
                 .filter(value => !!value);
 
-            console.log('fieldNames', fieldNames);
-
             const selectedFields = await this.appendSelects(type, fieldNames);
-
-            console.log('selectedFields', selectedFields);
-
-            return {
-                'q/from': type['fibery/name'],
-                'q/where': undefined,
-                'q/order-by': [
-                    [['fibery/creation-date'], 'q/asc']
-                ],
-                'q/select': Array.from(selectedFields),
-                'q/limit': 3,
+            const queryObject = {
+                query: {
+                    'q/from': type['fibery/name'],
+                    'q/select': Array.from(selectedFields),
+                    'q/limit': limit > 0 ? limit : 'q/no-limit'
+                },
+                params: {},
             };
+            if (dateFields) {
+                queryObject.query['q/order-by'] = [[dateFields, 'q/asc']];
+                if (lastMaxTimestamp) {
+                    queryObject.params['$lastMaxTimestamp'] = lastMaxTimestamp;
+                    queryObject.query['q/where'] = ['q/or']
+                        .concat(...dateFields.map(dateField => ['>', dateField, '$lastMaxTimestamp']));
+                }
+            }
+            return queryObject;
         }
     },
 }
