@@ -11,7 +11,6 @@ const FIBERY_META = {
         'fibery/id',
         'fibery/public-id',
         'fibery/creation-date',
-        'fibery/modification-date',
         'fibery/url',
         'fibery/type',
     ],
@@ -200,13 +199,14 @@ module.exports = {
                 },
                 params: {},
             };
-            if (dateFields) {
-                queryObject.query['q/order-by'] = [[dateFields, 'q/asc']];
-                if (lastMaxTimestamp) {
-                    queryObject.params['$lastMaxTimestamp'] = lastMaxTimestamp;
+            if (dateFields && lastMaxTimestamp) {
+                queryObject.params['$lastMaxTimestamp'] = lastMaxTimestamp;
+                queryObject.query['q/order-by'] = dateFields.map(dateField => [[dateField], 'q/asc']);
+                if (dateFields.length > 1)
                     queryObject.query['q/where'] = ['q/or']
-                        .concat(...dateFields.map(dateField => ['>', dateField, '$lastMaxTimestamp']));
-                }
+                        .concat(dateFields.map(dateField => ['>', [dateField], '$lastMaxTimestamp']));
+                else
+                    queryObject.query['q/where'] = ['>', dateFields, '$lastMaxTimestamp'];
             }
             return queryObject;
         }

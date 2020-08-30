@@ -2,7 +2,7 @@ const fibery = require('https://github.com/blessingefkt/fibery-pipedream-event-s
 
 module.exports = {
     name: "fibery-entities-created-or-updated",
-    version: "0.0.1",
+    version: "0.0.7",
     props: {
         fibery,
         db: "$.service.db",
@@ -31,8 +31,9 @@ module.exports = {
         },
     },
     async run(event) {
-        const dbKey = `lastMaxTimestamp/${this.fibery.$auth.account_name}/${this.entityType}`;
-        const lastMaxTimestamp = this.db.get(dbKey);
+        const entityTypeKey = Buffer.from(`${this.fibery.$auth.account_name}/${this.entityType}`).toString('base64');
+        const dbKey = 'lastMaxTimestamp/'+ entityTypeKey;
+        const lastMaxTimestamp = this.db.get(dbKey) || new Date().toISOString();
         const queryObject = await this.fibery.getQueryObject(this.entityType, {
             lastMaxTimestamp: lastMaxTimestamp,
             fields: this.fields,
