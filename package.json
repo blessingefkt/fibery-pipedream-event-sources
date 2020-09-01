@@ -1,6 +1,6 @@
 {
   "name": "@blessingefkt/fibery-pipedream-integration",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "dependencies": {
     "fibery-unofficial": "^0.2.1",
     "lodash.sortby": "^4.7.0"
