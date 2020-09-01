@@ -153,3 +153,7 @@ module.exports.getSimpleFields = function getSimpleFields(fields) {
                 || FIBERY_META.complexTypes.includes(f['fibery/type'])
             ));
 }
+
+module.exports.isHiddenType = function (name) {
+    return FIBERY_META.hiddenTypes.includes(name);
+}

@@ -27,7 +27,7 @@ module.exports = function FiberyAdapter(credentials) {
             return sortby(
                 helpers.uniqueArray(
                     schema
-                        .filter(type => !FIBERY_META.hiddenTypes.includes(type['fibery/name']))
+                        .filter(type => !helpers.isHiddenType(type['fibery/name']))
                         .map(type => type['fibery/name'])
                 )
                     .map(fieldName => ({value: fieldName, label: fieldName,})),
