@@ -1,3 +1,5 @@
-const {getQueryObject} = require('./fibery.adapter');
+const {getQueryObject, getRelatedFields, getSimpleFields} = require('./fibery.helpers');
+
 module.exports.getQueryObject = getQueryObject;
-module.exports.pipedreamApp = require('./fibery.app');
+module.exports.getSimpleFields = getSimpleFields;
+module.exports.getRelatedFields = getRelatedFields;
