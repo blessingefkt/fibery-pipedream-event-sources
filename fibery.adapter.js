@@ -19,7 +19,7 @@ module.exports = function FiberyAdapter(credentials) {
         },
         async schema() {
             if (!this._schema)
-                this._schema = await this.getClient().getSchema();
+                this._schema = helpers.getSchemaMap(await this.getClient().getSchema());
             return this._schema;
         },
         async typeOptions() {
@@ -59,7 +59,8 @@ module.exports = function FiberyAdapter(credentials) {
             return await this.getClient().entity.query(query, params);
         },
         async getQueryObject(typeNameOrId, {fields, dateFields, limit, lastMaxTimestamp}) {
-            return helpers.getQueryObject(await this.getSchema(), typeNameOrId, {fields, dateFields, limit, lastMaxTimestamp});
+            const schemaMap = await this.getSchema();
+            return helpers.getQueryObject(schemaMap, typeNameOrId, {fields, dateFields, limit, lastMaxTimestamp});
         }
     }
 }

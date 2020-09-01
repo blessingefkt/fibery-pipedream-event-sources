@@ -98,13 +98,20 @@ function appendSelects(schema, typeNameOrId, fieldNames) {
 }
 
 module.exports.uniqueArray = uniqueArray;
-module.exports.getQueryObject = function getQueryObject(schema, typeNameOrId, {fields, dateFields, limit, lastMaxTimestamp}) {
-    if (Array.isArray(schema))
-        schema = schema.reduce(
-            (schemaMap, _type) => Object.assign(schemaMap, {[_type['fibery/name']]: _type}),
-            {}
-        );
-    const type = schema[typeNameOrId];
+
+module.exports.getSchemaMap = function getSchemaMap(schema) {
+    return Array.from(schema).reduce(
+        (schemaMap, _type) => {
+            const name = _type['fibery/name'];
+            schemaMap[name] = _type;
+            return schemaMap;
+        },
+        {}
+    );
+}
+
+module.exports.getQueryObject = function getQueryObject(schemaMap, typeNameOrId, {fields, dateFields, limit, lastMaxTimestamp}) {
+    const type = schemaMap[typeNameOrId];
     const fieldNames = fields
         .map(value => {
             if (String(value).includes('/'))
@@ -116,7 +123,7 @@ module.exports.getQueryObject = function getQueryObject(schema, typeNameOrId, {f
         })
         .filter(value => !!value);
 
-    const selectedFields = appendSelects(schema, type, fieldNames);
+    const selectedFields = appendSelects(schemaMap, type, fieldNames);
     const queryObject = {
         query: {
             'q/from': type['fibery/name'],
