@@ -1,6 +1,3 @@
-const Fibery = require('fibery-unofficial');
-const sortby = require('lodash.sortby');
-
 const FIBERY_META = {
     complexTypes: [
         "fibery/file",
@@ -138,6 +135,8 @@ function getQueryObject(schema, typeNameOrId, {fields, dateFields, limit, lastMa
  * @param {{api_key:String, account_name?:string, host?:string}} credentials
  */
 function FiberyAdapter(credentials) {
+    const sortby = require('lodash.sortby');
+    const Fibery = require('fibery-unofficial');
     return {
         getClient() {
             const {account_name, api_key, host} = credentials;
