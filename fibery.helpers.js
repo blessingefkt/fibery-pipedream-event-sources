@@ -36,6 +36,7 @@ function getDefaultFieldNames(fields) {
 }
 
 function appendSelects(schema, typeNameOrId, fieldNames) {
+    console.debug('appendSelects for', typeNameOrId, !!schema[typeNameOrId]);
     const typeFields = schema[typeNameOrId]['fibery/fields'];
     const selects = getDefaultFieldNames(typeFields);
     typeFields
@@ -123,7 +124,7 @@ module.exports.getQueryObject = function getQueryObject(schemaMap, typeNameOrId,
         })
         .filter(value => !!value);
 
-    const selectedFields = appendSelects(schemaMap, type, fieldNames);
+    const selectedFields = appendSelects(schemaMap, typeNameOrId, fieldNames);
     const queryObject = {
         query: {
             'q/from': type['fibery/name'],
