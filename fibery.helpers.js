@@ -99,6 +99,11 @@ function appendSelects(schema, typeNameOrId, fieldNames) {
 
 module.exports.uniqueArray = uniqueArray;
 module.exports.getQueryObject = function getQueryObject(schema, typeNameOrId, {fields, dateFields, limit, lastMaxTimestamp}) {
+    if (Array.isArray(schema))
+        schema = schema.reduce(
+            (schemaMap, _type) => Object.assign(schemaMap, {[_type['fibery/name']]: _type}),
+            {}
+        );
     const type = schema[typeNameOrId];
     const fieldNames = fields
         .map(value => {
