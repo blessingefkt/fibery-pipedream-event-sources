@@ -1,0 +1,28 @@
+{
+  "name": "@blessingefkt/fibery-pipedream-integration",
+  "version": "0.0.1",
+  "dependencies": {},
+  "devDependencies": {
+    "fibery-unofficial": "^0.2.1",
+    "lodash.sortby": "^4.7.0"
+  },
+  "description": "Pipedream is a platform for running hosted, backend components. An HTTP Event Source is essentially a [RequestBin](https://requestbin.com) that can be managed via API.",
+  "main": "fibery.adapter.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blessingefkt/fibery-pipedream-event-sources.git"
+  },
+  "author": "blessingefkt",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blessingefkt/fibery-pipedream-event-sources/issues"
+  },
+  "homepage": "https://github.com/blessingefkt/fibery-pipedream-event-sources#readme",
+  "keywords": [
+    "fibery",
+    "pipedream"
+  ]
+}

@@ -3,7 +3,7 @@ _*
 *.http
 node_modules
 *.private.*
-package.json
 package-lock.json
+cu.js
 README.md.orig.*
 README.md.toc.*

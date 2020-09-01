@@ -1,7 +1,7 @@
 const fibery = require('https://github.com/blessingefkt/fibery-pipedream-event-sources/fibery.app.js');
 module.exports = {
     name: "fibery-entities-created",
-    version: "0.0.5",
+    version: "0.0.6",
     props: {
         fibery,
         db: "$.service.db",
@@ -9,13 +9,13 @@ module.exports = {
             description: "ID of an Entity Type",
             type: "string",
             async options() {
-                return await this.fibery.typeOptions();
+                return await this.fibery.adapter().typeOptions();
             }
         },
         fields: {
             type: "string[]",
             async options() {
-                return this.fibery.getTypeFieldOptions(this.entityType);
+                return this.fibery.adapter().getTypeFieldOptions(this.entityType);
             },
         },
         limit: {
@@ -30,10 +30,10 @@ module.exports = {
         },
     },
     async run(event) {
-        const entityTypeKey = Buffer.from(`${this.fibery.$auth.account_name}/${this.entityType}`).toString('base64');
+        const entityTypeKey = Buffer.from(`${this.fibery.adapter().$auth.account_name}/${this.entityType}`).toString('base64');
         const dbKey = 'lastMaxTimestamp/'+ entityTypeKey;
         const lastMaxTimestamp = this.db.get(dbKey) || new Date().toISOString();
-        const queryObject = await this.fibery.getQueryObject(this.entityType, {
+        const queryObject = await this.fibery.adapter().getQueryObject(this.entityType, {
             fields: this.fields,
             dateFields: ['fibery/creation-date'],
             lastMaxTimestamp: lastMaxTimestamp,
@@ -43,7 +43,7 @@ module.exports = {
         console.log('queryObject', JSON.stringify(queryObject, null, 2));
         let entities = [];
 
-        entities = await this.fibery.queryEntities(queryObject.query, queryObject.params);
+        entities = await this.fibery.adapter().queryEntities(queryObject.query, queryObject.params);
         if (!entities.length) {
             console.log(`No new entities.`);
             return;
