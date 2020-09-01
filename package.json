@@ -7,9 +7,9 @@
     "lodash.sortby": "^4.7.0"
   },
   "description": "Pipedream is a platform for running hosted, backend components. An HTTP Event Source is essentially a [RequestBin](https://requestbin.com) that can be managed via API.",
-  "main": "fibery.adapter.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 0"
   },
   "repository": {
     "type": "git",
